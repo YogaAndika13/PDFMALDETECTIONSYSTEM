@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Scan Results{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-5">Scan Results</h1>
+            <p class="text-muted">Analysis performed using <strong>Scenario {{ scenario }}</strong>.</p>
+        </div>
+        <a href="{{ url_for('static', filename='results.csv') }}" class="btn btn-success" download>
+            <i class="fas fa-download"></i> Download Results (CSV)
+        </a>
+    </div>
+
+    {% if is_batch %}
+        {# Batch results view with improved layout and details #}
+        <div class="row mb-4">
+            <div class="col-md-5">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Detection Distribution</h5>
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Confidence Scores</h5>
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Detailed Results</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Filename</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Confidence</th>
+                                <th>Top Influential Feature (SHAP)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ result.filename }}</td>
+                                <td class="text-center">
+                                    <span class="badge fs-6 bg-{{ 'danger' if result.status == 'Malicious' else 'success' }}">
+                                        {{ result.status }}
+                                    </span>
+                                </td>
+                                <td class="text-center">{{ "%.2f"|format(result.confidence * 100) }}%</td>
+                                <td>
+                                    {% if result.top_features %}
+                                        <span class="font-monospace">{{ result.top_features[0].feature }}</span>
+                                        <small class="text-muted"> (SHAP: {{ "%.4f"|format(result.top_features[0].value) }})</small>
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        {# Single file result view with detailed SHAP feature list #}
+        {% set result = results[0] %}
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        Result for: <strong>{{ result.filename }}</strong>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title mb-4">
+                            <span class="badge fs-5 bg-{{ 'danger' if result.status == 'Malicious' else 'success' }}">
+                                {{ result.status }}
+                            </span>
+                        </h3>
+                        <p class="card-text fs-5">
+                            <strong>Confidence Score:</strong> {{ "%.2f"|format(result.confidence * 100) }}%
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <strong>Top 5 Most Influential Features (SHAP Values)</strong>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        {% if result.top_features %}
+                            {% for feature in result.top_features %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="font-monospace">{{ feature.feature }}</span>
+                                <span class="badge bg-{{ 'danger' if feature.value > 0 else 'primary' }} rounded-pill">
+                                    {{ "%.4f"|format(feature.value) }}
+                                </span>
+                            </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item">Feature importance not available.</li>
+                        {% endif %}
+                    </ul>
+                    <div class="card-footer text-muted">
+                        Positive values push toward "Malicious", negative values push toward "Benign".
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if is_batch and chart_data %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pie Chart
+    var pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ chart_data.pie_chart.labels | tojson }},
+            datasets: [{
+                data: {{ chart_data.pie_chart.data | tojson }},
+                backgroundColor: ['#dc3545', '#198754'],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+
+    // Bar Chart
+    var barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_data.bar_chart.labels | tojson }},
+            datasets: [{
+                label: 'Confidence Score',
+                data: {{ chart_data.bar_chart.data | tojson }},
+                backgroundColor: 'rgba(0, 123, 255, 0.6)',
+                borderColor: 'rgba(0, 123, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1.0,
+                    ticks: {
+                        callback: function(value) {
+                            return (value * 100) + '%'
+                        }
+                    }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

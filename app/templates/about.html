@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}About - PDF Malware Detection{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h1 class="card-title">About This Project</h1>
+        <p class="lead">This web application is designed to detect malware in PDF files using a machine learning approach.</p>
+        
+        <h2 class="mt-4">Methodology</h2>
+        <p>The core of this system is a <strong>Stacking Ensemble model combining a Multi-Layer Perceptron (MLP) and a Support Vector Machine (SVM)</strong>. This model has been pre-trained on a comprehensive dataset of benign and malicious PDF files.</p>
+        <p>The detection process involves:</p>
+        <ol>
+            <li><strong>Feature Extraction:</strong> Static and dynamic features are extracted from the uploaded PDF files. These features capture various characteristics of the PDF structure and content that are indicative of malicious intent.</li>
+            <li><strong>Prediction:</strong> The extracted features are fed into the pre-trained MLP-SVM stacking model, which classifies the file as either 'Benign' (safe) or 'Malicious'.</li>
+            <li><strong>Explainability:</strong> To provide insight into the model's decision, we use <strong>SHAP (SHapley Additive exPlanations)</strong>. This technique highlights which features were most influential in the prediction for a given file.</li>
+        </ol>
+
+        <h2 class="mt-4">Limitations</h2>
+        <ul>
+            <li>The accuracy of the detection is dependent on the pre-trained model and the features it was trained on.</li>
+            <li>The system may not be able to detect all types of PDF-based malware, especially novel or highly obfuscated threats.</li>
+            <li>The feature extraction process might not handle all PDF formats or encrypted files perfectly.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

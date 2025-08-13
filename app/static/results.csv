@@ -1,0 +1,2 @@
+filename,status,confidence,dominant_feature,top_features
+02frrltr.pdf,Malicious,1.0,MetadataSize,"[{'feature': 'MetadataSize', 'value': np.float64(0.0)}, {'feature': 'PdfSize', 'value': np.float64(0.0)}]"

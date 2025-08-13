@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Home - PDF Malware Detection{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <h1 class="display-4">PDF Malware Detection</h1>
+                <p class="lead text-muted">A machine learning-powered tool to analyze PDF files for potential threats.</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <h5 class="card-title mb-4">Select Analysis Scenario & Upload File</h5>
+                    <form action="{{ url_for('home') }}" method="post" enctype="multipart/form-data">
+                        
+                        <div class="mb-4">
+                            <label for="scenario" class="form-label"><strong>Analysis Scenario:</strong></label>
+                            <select class="form-select" id="scenario" name="scenario">
+                                <option value="A">A → Dynamic Features, Stacking MLP-SVM</option>
+                                <option value="C">SOON [Under Development]</option>
+                                <option value="D">SOON [Under Development]</option>
+                                <option value="E">SOON [Under Development]</option>
+                            </select>
+                            <small class="form-text text-muted">Choose the model and feature set for the analysis.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="file" class="form-label"><strong>File (PDF or ZIP):</strong></label>
+                            <input class="form-control" type="file" id="file" name="file" accept=".pdf,.zip" required>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-upload"></i> Upload and Analyze
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="text-muted"><small>Supported files: Single PDF or a ZIP archive containing multiple PDFs.</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
